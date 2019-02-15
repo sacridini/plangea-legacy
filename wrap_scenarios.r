@@ -27,8 +27,8 @@ rest.area = list(BONN=1.5e6, NYDC=3.5e6, CTRY=13.3719e6,
 # Limits to restoration per country ############################################
 
 # Reading raster with countries, and corresponding csv with country IDs
-world.ras = raster('../world-prod-estimates/countries-shp/countries-code.tif')
-world.csv = read.csv('../world-prod-estimates/countries-shp/countries-code.csv')
+world.ras = raster(paste0(dir,'countries-code.tif'))
+world.csv = read.csv(paste0(dir, 'world-prod-estimates/countries-shp/countries-code.csv'))
 
 # Sub-setting a country (ex. Brazil, code 33)
 # br_index = (world.ras==33)
@@ -52,7 +52,7 @@ constr.list = list(unconstrained = matrix(g_scalar_area, nrow=1, ncol=np),
                    country.limits = country.coefs * g_scalar_area)
 
 # Reading country-level limits to restoration
-ctry.lims = read.csv('../global_rest_econ/restoration-constraints-per-country.csv')
+ctry.lims = read.csv(paste0(dir, 'restoration-constraints-per-country.csv'))
 
 # Shaving-off unnecessary data from the table
 ctry.lims = ctry.lims[-length(ctry.lims[,1]),c(1,length(ctry.lims[1,]))]
