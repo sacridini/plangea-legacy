@@ -1,0 +1,38 @@
+[
+	"io" {
+		"rawdata_path": "./rawdata/",
+		"preprocessed_data_location_name": "inputdir",
+		"output_path": "./results/"
+	}
+
+	"variables" {
+		"variable_names": ["cb", "bd", "oc"],    // STRING. names that will be used as objects in the R environment
+		"ready_variables": [true, false, true],  // LOGICAL. TRUE for variables that have a final raster file ready in the rawdata folder
+		"variable_types": ["B", "B", "C"],   // STRING. Defines whether the variable is a (B)enefit or a (C)ost
+		"variable_weights": [1, [1, 10, 100, 1000], 1], 
+		"variables_folder": "./variables/",
+		"variable_raster_names": ["carbon.tif", "", "opportunity_costs.tif"]
+	}
+
+	"land-use_classes" {
+		"class_names": ["FOR", "NGR", "SHR", "DES", "WET", "AGR", "CGR", "PFO", "WAT", "NRE"],
+		"class_types": ["N", "N", "N", "N", "N", "A", "A", "A", "I", "I"],  // STRING. Defines whether the class is (N)atural, (A)nthropic, of (I)gnore
+		"class_folder": "./land-use/",
+		"classes_raster_names": ["forest.tif", "nat_grassland.tif", "shrubland.tif", "desert.tif", "wetland.tif", "cult_grassland.tif", "planted_forest.tif", "water_bodies.tif", "non-restorable.tif"]
+	}
+
+	"scenarios" {
+		"problem_type": "R", // STRING. Defines whether the script should prioritize for (R)estoration, (C)onservation, or (B)oth
+		"include_OA": false,
+		"benchmark_scenarios": ["cb", "bd", "oc", ["cb", "bd"], ["cb","oc"], ["bd","oc"], ["cb", "bd", "oc"]],
+		"nsteps_per_benchmark": [1, 10, 1, 10, 1, 10, 10],
+		"targets": [5000000, 10000000, "grad"],
+		"sub-region_scenarios": {
+			"include_subregion_scenarios": true,
+			"sub-region names": ["AMZ", "CAA", "CER", "PAN", "MAT", "PAM"],
+			"sub-region_folder": "./sub-regions/",
+			"sub-region_raster_names": ["amazon.tif", "caatinga.tif", "cerrado.tif", "pantanal.tif", "mata_atlantica.tif", "pampas.tif"],
+			"sub-region_targets": [10000000, 200000, 3500000, 20000, 1000000, 180000],
+		}
+	}
+]
