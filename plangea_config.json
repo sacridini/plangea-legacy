@@ -1,7 +1,7 @@
 {
 	"io": {
 		"rawdata_path": "./rawdata/",
-		"preprocessed_data_location_name": "C:/Users/iis/Desktop/Lucas/1-Scripts/R/1-Global-PPBio/plangea/inputdata_v6/",
+		"preprocessed_data_location_name": "~/Documents/IIS_PROJECTS/global_rest_prior/global_rest_priorization/inputdata_v6/",
 		"output_path": "./results/"
 	},
 
@@ -30,7 +30,7 @@
 		"targets": ["1.5e6", "3.5e6", "13.3719e6", "12.7e6", "25.4e6", "8466e6"],
 			"sub-region_scenarios": {
 			"include_subregion_scenarios": true,
-			"sub-region_folder": "./",
+			"sub-region_folder": "",
 			"sub-region_raster_name": "countries-code.tif",
 			"sub-region_names_table": "countries-code.csv",
 			"sub-region_flat_targets": false,
