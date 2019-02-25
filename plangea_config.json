@@ -1,7 +1,7 @@
 {
 	"io": {
 		"rawdata_path": "./rawdata/",
-		"preprocessed_data_location_name": "inputdir",
+		"preprocessed_data_location_name": "C:/Users/iis/Desktop/Lucas/1-Scripts/R/1-Global-PPBio/plangea/inputdata_v6/",
 		"output_path": "./results/"
 	},
 
@@ -26,13 +26,15 @@
 		"include_OA": false,
 		"benchmark_scenarios": ["cb", "bd", "oc", ["cb", "bd"], ["cb","oc"], ["bd","oc"], ["cb", "bd", "oc"]],
 		"nsteps_per_benchmark": [1, 10, 1, 10, 1, 10, 10],
-		"targets": [5000000, 10000000, "grad"],
-		"sub-region_scenarios": {
+		"target_names": ["BONN", "NYDC", "CTRY", "CBD", "CBD2", "WRLD"],
+		"targets": ["1.5e6", "3.5e6", "13.3719e6", "12.7e6", "25.4e6", "8466e6"],
+			"sub-region_scenarios": {
 			"include_subregion_scenarios": true,
-			"sub-region names": ["AMZ", "CAA", "CER", "PAN", "MAT", "PAM"],
-			"sub-region_folder": "./sub-regions/",
-			"sub-region_raster_names": ["amazon.tif", "caatinga.tif", "cerrado.tif", "pantanal.tif", "mata_atlantica.tif", "pampas.tif"],
-			"sub-region_targets": [10000000, 200000, 3500000, 20000, 1000000, 180000]
+			"sub-region_folder": "./",
+			"sub-region_raster_name": "countries-code.tif",
+			"sub-region_names_table": "countries-code.csv",
+			"sub-region_flat_targets": false,
+			"sub-region_targets": "restoration-constraints-per-country-total.csv" 
 		}
 	}
 }
