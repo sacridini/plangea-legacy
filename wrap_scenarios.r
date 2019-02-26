@@ -28,7 +28,7 @@ rest.area = list(BONN=1.5e6, NYDC=3.5e6, CTRY=13.3719e6,
 
 # Reading raster with countries, and corresponding csv with country IDs
 world.ras = raster(paste0(dir,'countries-code.tif'))
-world.csv = read.csv(paste0(dir, 'world-prod-estimates/countries-shp/countries-code.csv'))
+world.csv = read.csv(paste0(dir, 'countries-code.csv'))
 
 # Sub-setting a country (ex. Brazil, code 33)
 # br_index = (world.ras==33)
@@ -91,14 +91,16 @@ slist.form = list("cb-oc", "cb", "bd-oc", "bd", "cb-bd-oc", "cb-bd", "oc",
                   "rnd", "wrld")
 slist.weights = list(list(w.cb=1,w.bd=1), list(w.cb=1,w.bd=1),
                     list(w.cb=1,w.bd=1), list(w.cb=1,w.bd=1),
-#                    list(w.cb=c(10, 5, 1, rep(1,7)),
-#                         w.bd=c(rep(1,3), 5, 10, 50, 100, 500, 1000, 5000)),
-#                    list(w.cb=c(10, 5, 1, rep(1,7)),
-#                         w.bd=c(rep(1,3), 5, 10, 50, 100, 500, 1000, 5000)),
-                    list(w.cb=c(rep(1,5)),
-                         w.bd=c(1, 10, 100, 1000, 10000)),
-                    list(w.cb=c(rep(1,5)),
-                         w.bd=c(0.1, 0.5, 1.5, 10, 500)),
+                    list(w.cb=rep(1,10),
+                         w.bd=c(1, 5, 10, 50, 100, 500, 1000, 5000, 7500, 10000)),
+                    list(w.cb=rep(1,10),
+                         w.bd=c(1, 5, 10, 50, 100, 500, 1000, 5000, 7500, 10000)),
+#
+#                    list(w.cb=c(rep(1,5)),
+#                         w.bd=c(1, 10, 100, 1000, 10000)),
+#                    list(w.cb=c(rep(1,5)),
+#                         w.bd=c(0.1, 0.5, 1.5, 10, 500)),
+#
 #                    list(w.cb=c(rep(1,9),0),
 #                         w.bd=c(0, 1, 4, 10, 40, 100, 400, 1000, 4000, 1)),
 #                    list(w.cb=c(rep(1,8),0),
@@ -151,8 +153,10 @@ for (sct in sct.range){
       scen = save.name
       objfuncform = scb
       sense = rep(slist.sense[scb][[1]], nrow(constr))
-      if (exists('overwrite.nsteps')){nsteps=overwrite.nsteps}
-      else {nsteps = slist.nsteps[scb][[1]]}
+      
+      nsteps = slist.nsteps[scb][[1]]
+      if ((nsteps>1) & (exists('overwrite.nsteps'))){nsteps=overwrite.nsteps}
+      
       #if (exists('flat.ctrylim')) {rhs = rhs.list[scc][[1]]
       #                             rhs[length(rhs)] = rhs[length(rhs)]/nsteps
       #                            } else {rhs = rhs.list[scc][[1]] / nsteps}
@@ -166,7 +170,6 @@ for (sct in sct.range){
       weightm = matrix(unlist(weights), ncol = length(weights))
       save(weightm, file=paste0(outdir, save.name, "_weightm.RData"))
       n.weights = ifelse(random, 1, length(weights$w.cb))
-      
       
       source("run_scenario_fun.r")
       

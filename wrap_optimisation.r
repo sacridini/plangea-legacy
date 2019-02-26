@@ -63,12 +63,15 @@
 # time I tried to run "scen_rnd", but I haven't checked if they corrected the
 # random allocation scenario as well.
 
+home.dir = '~/Documents/IIS_PROJECTS/plangea-legacy/'
+setwd(home.dir)
+
 
 # PRE-PROCESSING (INCLUDING AUXILIARY ANALYSES: OA AND OPPORTUNITY COSTS) ######
-source('preprocessing.r', echo=T)
-rm(list=ls(all=T))
-Sys.sleep(1)
-gc()
+#source('preprocessing.r', echo=T)
+#rm(list=ls(all=T))
+#Sys.sleep(1)
+#gc()
 
 
 # SCENARIO BLOCK 1: OVERALL-RESTORATION LIMITS ONLY ############################
@@ -77,8 +80,9 @@ print.steps = F
 ub.perc.constraint = 1
 ublim.suffix = ''
 ublim.cty.range = 1
-target.range = 4 #c(1,2,4)
+target.range = 4
 bench.range = 1:7
+overwrite.nsteps = 5
 source("optimisation.r")
 
 rm(list=ls(all=T))
@@ -93,24 +97,29 @@ print.steps = T
 wrld.form = 1
 ub.perc.constraint = 1
 #ublim.suffix = paste0('-ublim_',round(ub.perc.constraint,2))
-#flat.ctrylim = 0.15
+flat.ctrylim.vals = c(0.1, 0.2, 0.3)
 ublim.suffix = ifelse(exists('flat.ctrylim'), paste0('-ctrylim_',flat.ctrylim), '-econ-ctrylims_')
 ublim.cty.range = 2
 target.range = 4
-bench.range = c(2,4,5,7)
+bench.range = 1:7
 #wgt.range = 1
 #overwrite.nsteps = 1
-source("optimisation.r")
-if (exists('flat.ctrylim')){rm(flat.ctrylim)}
 
-flat.ctrylim.df = c()
-for (ns in 1:nsteps){
-  #  load(paste0(outdir, scen, "_step.res_", ns, ".RData"))
-  #  step.ras = step.ras + ((nsteps-i) * step.res)
-  flat.ctrylim.df = rbind(flat.ctrylim.df,
-                      postprocess.grad(dir, outdir, ns=ns, filename=paste0(scen, "_res.total.restored.pu_step_", ns, ".RData")))
+for (flat.ctrylim in flat.ctrylim.vals){
+  source("optimisation.r")
+  
+  if (exists('flat.ctrylim')){rm(flat.ctrylim)}
+  
+  flat.ctrylim.df = c()
+  for (ns in 1:nsteps){
+    #  load(paste0(outdir, scen, "_step.res_", ns, ".RData"))
+    #  step.ras = step.ras + ((nsteps-i) * step.res)
+    flat.ctrylim.df = rbind(flat.ctrylim.df,
+                            postprocess.grad(dir, outdir, ns=ns,
+                                             filename=paste0(scen, "_res.total.restored.pu_step_", ns, ".RData")))
+  }
+  write.csv(flat.ctrylim.df, file=paste0("./display_results_CBD_v8/world_gradient_results",ublim.suffix, ".csv"), row.names=F)
 }
-write.csv(flat.ctrylim.df, file=paste0("./display_results_CBD_v8/world_gradient_results",ublim.suffix, ".csv"), row.names=F)
 
 rm(list=ls(all=T))
 Sys.sleep(1)
@@ -159,13 +168,13 @@ gc()
 #load("allscenarios_results.df.RData")
 info = F # Should plots be printed with diagnostics info?
 print.steps = F
-ub.perc.vals = c(1/3, 2/3)
+ub.perc.vals = seq(from=0.15, to=0.95, by=0.1)
 
 for (ub.perc.constraint in ub.perc.vals){
     ublim.suffix = paste0('-ublim_',round(ub.perc.constraint,2))
     ublim.cty.range = 1
     target.range = 4
-    bench.range = c(2,4,5,7)
+    bench.range = 1:7
     source("optimisation.r")
 }
 
