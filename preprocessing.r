@@ -49,6 +49,9 @@ save(A, file=paste0(dir, "A.RData"))
 r.occ <- raster("./rawdata/5km/others/opportunity_costs_cropland_4.9km_Molweide.tif")
 r.ocg <- raster("./rawdata/5km/others/opportunity_costs_grassland_4.9km_Molweide.tif")
 
+# opportunity cost variations under Discount Rate epsilon of 1.e-6
+r.occ.d = raster('./rawdata/5km/others/opportunity_costs_cropland_add-eps-DR_4.9km_Molweide.tif')
+r.ocg.d = raster('./rawdata/5km/others/opportunity_costs_grassland_add-eps-DR_4.9km_Molweide.tif')
 
 # carbon
 #r.cb <- raster("Erb_et_al_Fig4A_Resampled/ExtDat_Fig4A_gcm_reamostrado.tif")
@@ -56,6 +59,9 @@ r.ocg <- raster("./rawdata/5km/others/opportunity_costs_grassland_4.9km_Molweide
 #r.cb <- raster("./cb_26May2018/CarbonANDSoilDELTA_Final.tif")
 #r.cb = raster('./rawdata/5km/others/C_DELTA_biomass_SOC30cm_v11.tif')
 r.cb = raster('./rawdata/5km/others/DELTA_C_BiomassSoil30cm_v12.1.tif')
+
+# carbon standard-deviation layer
+r.cb.sd = raster('./rawdata/5km/others/C_SD_Biomass_Combined_COMPLETE_v12.1.tif')
 
 # countries
 r.cntry <- raster("./rawdata/5km/others/countries-code.tif")
@@ -76,8 +82,10 @@ r.plc8 <- raster("./rawdata/5km/current_LU/ESA_landuse_300m_2015_ice_media_4.9km
 r.tot = r.plc1 + r.plc2 + r.plc3 + r.plc4 + r.plc5 + r.plc6 + r.plc7 + r.plc8
 r.bg <- (r.tot<0); r.bg[r.bg==1] = NA
 r.tot = r.tot + r.bg
-writeRaster(r.bg, './rawdata/5km/others/background_frame_World_4.9km_Molweide.tif', overwrite=T)
 r.terr = r.tot - raster("./rawdata/5km/current_LU/ESA_landuse_300m_2015_water_media_4.9km_Molweide.tif")
+
+writeRaster(r.bg, './rawdata/5km/others/background_frame_World_4.9km_Molweide.tif', overwrite=T)
+
 
 # Correcting anthropic areas using crop map
 anth.total = r.plc1 + r.plc2
@@ -441,6 +449,7 @@ length(which(!vals == 1))/length(master_index)
 
 ### (DELTA) CARBON VALUE
 
+# central values
 cb <- values(r.cb)[master_index]
 summary(cb)
 # fill in NA values with mean carbon
@@ -449,6 +458,11 @@ summary(cb)
 if (length(which(is.na(cb))) > 0) cb <- replace(cb, which(is.na(cb)), mean(cb, na.rm=T))
 save(cb, file=paste0(dir, "cb.RData"))
 summary(cb)
+
+# standard deviations
+cb.sd = r.cb.sd[master_index]
+summary(cb.sd)
+save(cb.sd, file=paste0(dir, "cb-sd.RData"))
 
 
 ### ELEVATION VALUE
@@ -496,6 +510,37 @@ length(which(occ == 0))
 if (length(which(occ == 0)) > 0) occ <- replace(occ, which(occ == 0), min(occ[which(!occ==0)]))
 save(occ, file=paste0(dir, "occ.RData"))
 summary(occ)
+
+ocg.d <- values(r.ocg.d)[master_index]
+summary(ocg.d)
+if (length(which(is.na(ocg.d))) > 0) ocg.d <- replace(ocg.d, which(is.na(ocg.d)), mean(ocg.d, na.rm=T))
+length(which(ocg.d == 0))
+if (length(which(ocg.d == 0)) > 0) ocg.d <- replace(ocg.d, which(ocg.d == 0), min(ocg.d[which(!ocg.d==0)]))
+summary(ocg.d)
+
+occ.d <- values(r.occ.d)[master_index]
+summary(occ.d)
+if (length(which(is.na(occ.d))) > 0) occ.d <- replace(occ.d, which(is.na(occ.d)), mean(occ.d, na.rm=T))
+length(which(occ.d == 0))
+if (length(which(occ.d == 0)) > 0) occ.d <- replace(occ.d, which(occ.d == 0), min(occ.d[which(!occ.d==0)]))
+summary(occ.d)
+
+# Differentials of opportunity costs w.r.t. Discount Rate
+occ.diff = abs((occ.d - occ) / 1.e-6)
+ocg.diff = abs((ocg.d - ocg) / 1.e-6)
+
+# SD on opportunity costs propagated from uncertainty on the Discount Rate
+DR.sd = 0.01
+
+occ.sd = sqrt((occ.diff^2) * (DR.sd^2))
+summary(occ.sd)
+
+ocg.sd = sqrt((ocg.diff^2) * (DR.sd^2))
+summary(ocg.sd)
+
+save(occ.sd, file=paste0(dir, "occ-sd.RData"))
+save(ocg.sd, file=paste0(dir, "ocg-sd.RData"))
+
 
 
 ### COUNTRY VALUE
@@ -996,7 +1041,6 @@ habarea.t0 <- habarea.t0 * A
 summary(habarea.t0)
 min(habarea.t0)
 
-
 summary(habarea.t0)
 summary(habarea.max)
 summary(prop.hab.t0)
@@ -1009,6 +1053,9 @@ summary(exrisk.t0)
 # extinction risk slopes
 exrisk.t0.slope <- calc.extinction.slope(habarea.t0, habarea.max, z=0.25)
 summary(exrisk.t0.slope)
+
+# extinction risk uncertainties propagated from variation of 0.1 on z
+exrisk.t0.sd = extinction.risk.sd(habarea.t0, habarea.max, z=0.25, z.sd=0.1)
 
 
 # why large slopes?
@@ -1038,6 +1085,7 @@ save(habarea.t0, file=paste0(dir, "habarea.t0.RData"))
 save(habarea.max, file=paste0(dir, "habarea.max.RData"))
 save(exrisk.t0, file=paste0(dir, "exrisk.t0.RData"))
 save(exrisk.t0.slope, file=paste0(dir, "exrisk.t0.slope.RData"))
+save(exrisk.t0.sd, file=paste0(dir, "exrisk.t0.sd.RData"))
 
 # when restoration occurs it happens in proportion to the frequencies in OA
 

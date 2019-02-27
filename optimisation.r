@@ -30,10 +30,13 @@
 library(Rsymphony)
 library(Matrix)
 
+home.dir = '~/Documents/IIS_PROJECTS/plangea-legacy/'
+setwd(home.dir)
+
 source("functions.r")
 
 # set the input directory from which to load all the data for the optimisation
-dir <- '/home/alvaro/Documents/IIS_PROJECTS/global_rest_prior/global_rest_priorization/inputdata_v6'
+dir <- '/home/alvaro/Documents/IIS_PROJECTS/global_rest_prior/global_rest_priorization/inputdata_v6/'
 
 #scp ~/Documents/proj/iis_global_spp/inputdata_v1/species_index_list.RData 10.12.193.171:/home/hbeyer/Documents/proj/iis_global_spp/inputdata_v1/
 
@@ -189,7 +192,7 @@ summary(bd)
 # if (!dir.exists(outdir)) dir.create(outdir)
 
 # need to load this for the plotting functions:
-load("terrestrial_lands.RData")
+load(paste0(dir, "terrestrial_lands.RData"))
 
 # upper bound cannot exceed area available for restoration:
 ub <- (prop.crop + prop.cultg) * ub.perc.constraint

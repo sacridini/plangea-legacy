@@ -45,6 +45,42 @@ calc.objective.function <- function(form, bd, cb, oc, w.cb=1, w.bd=1, wrld.form=
 	}
 }
 
+calc.sd.objective <- function(form, bd, cb, oc, w.cb=1, w.bd=1, delta.cb=0, delta.bd=0, delta.oc=0, wrld.form=NULL){
+  if (form == 'wrld') {form = c('cb-bd-oc', 'cb', 'bd', 'oc')[wrld.form]}
+  #print(form)
+  if (form == "cb-bd"){
+    return((w.cb * delta.cb) + (w.bd * delta.bd))
+  } else {
+    if (form == "cb-bd-oc"){
+      return(((w.cb * delta.cb) + (w.bd * delta.bd) + ((w.cb + w.bd) / oc)*delta.oc) / oc)
+    } else {
+      if (form == "bd"){
+        return(delta.bd)
+      } else {
+        if (form == "bd-oc"){
+          return((delta.bd + ((w.cb + w.bd) / oc)*delta.oc) / oc)
+        } else {
+          if (form == "cb"){
+            return(delta.cb)
+          } else {
+            if (form == "cb-oc"){
+              return((delta.cb+ ((w.cb + w.bd) / oc)*delta.oc) / oc)
+            } else {
+              if (form == "oc"){
+                return((-dalta.oc + abs(min(-delta.oc)) + 1))
+              } else {
+                message("ERROR: undefined objective function form")
+                return(NULL)	
+              }
+            }
+          }
+        }
+      }
+    }		
+  }
+}
+
+
 
 # test the objective function calculation manually
 test.objective.function <- function(){
@@ -89,6 +125,27 @@ calc.bd <- function(slp){
 }
 
 
+calc.bd.sd <- function(A, Amax, z=0.25, z.sd=0.1){
+  bd1 <- rep(0, np)
+  bd2 <- rep(0, np)
+  slp1 = calc.extinction.slope(A, Amax, z=z)
+  slp2 = calc.extinction.slope(A, Amax, z=z+1.e-6)
+  for (i in 1:dim(usphab_proc)[1]){
+    hab.values <- prop.restore %*% usphab_proc[i,]
+    for (j in 1:length(usphab_index[[i]])){
+      if (!is.null(species_index_list_proc[[usphab_index[[i]][j]]])){
+        recs <- species_index_list_proc[[usphab_index[[i]][j]]]
+        bd1[recs] <- bd1[recs] + slp1[usphab_index[[i]][j]] * hab.values[recs]
+        bd2[recs] <- bd2[recs] + slp2[usphab_index[[i]][j]] * hab.values[recs]
+      }
+    }
+  }
+  diff.bd <- (bd2 - bd1) / 1.e-6
+  
+  bd.sd = sqrt ((diff.bd^2) * (z.sd^2))
+  return(bd.sd)
+}
+
 
 # function to calculate extinction risk
 # A: current area
@@ -98,6 +155,16 @@ extinction.risk <- function(A, Amax, z=0.25){
 	recs <- which(r < 0)
 	if (length(recs) > 0) r[recs] <- 0
 	return(r)
+}
+
+extinction.risk.sd <- function(A, Amax, z=0.25, z.sd=0.1){
+  r1 <- 1 - (A/Amax)^z
+  r2 <- 1 - (A/Amax)^(z+1.e-6)
+  r.diff = (r2-r1)/1.e-6
+  r.sd = sqrt((r.diff^2)*(z.sd^2))
+  recs <- which(r.sd < 0)
+  if (length(recs) > 0) r.sd[recs] <- 0
+  return(r.sd)
 }
 
 
@@ -182,11 +249,11 @@ area.latlon <- function(lon1, lon2, lat1, lat2){
 
 # returns the selected index postitions of master_index
 random.allocation <- function(area.target, area.available){
-	ord <- sample(c(1:length(area.available)), length(area.available), replace=FALSE)
-	cumarea <- cumsum(area.available[ord])
-	rec <- which(cumarea > area.target)[1] - 1
-	if (!is.na(rec)){rec=1}
-	return(ord[1:rec])
+  ord <- sample(c(1:length(area.available)), length(area.available), replace=FALSE)
+  cumarea <- cumsum(area.available[ord])
+  rec <- which(cumarea > area.target)[1] - 1
+  if (is.na(rec)){rec <- 1}
+  return(ord[1:rec])
 }
 
 
@@ -195,66 +262,94 @@ postprocess.results <- function(dir, outdir, scen, hasweights=TRUE){
   if (hasweights){
     load(file=paste0(outdir, scen, "_weightm.RData"))
     load(file=paste0(dir, "exrisk.t0.RData"))
+    load(file=paste0(dir, "exrisk.t0.sd.RData"))
     load(file=paste0(dir, "cb.RData"))
+    load(file=paste0(dir, "cb-sd.RData"))
     load(file=paste0(dir, "ocg.RData"))
+    load(file=paste0(dir, "ocg-sd.RData"))
     load(file=paste0(dir, "occ.RData"))
+    load(file=paste0(dir, "occ-sd.RData"))
     load(file=paste0(dir, "prop.crop.RData"))
     load(file=paste0(dir, "prop.cultg.RData"))
     oc <- (prop.crop / (prop.crop + prop.cultg)) * occ + (prop.cultg / (prop.crop + prop.cultg)) * ocg 
     
-    exrisk.mean <- rep(0, dim(weightm)[1])
+    #exrisk.mean <- rep(0, dim(weightm)[1])
     exrisk.sum <- rep(0, dim(weightm)[1])
-    exrisk.red.mean.abs <- rep(0, dim(weightm)[1])
+    #exrisk.red.mean.abs <- rep(0, dim(weightm)[1])
     exrisk.red.sum.abs <- rep(0, dim(weightm)[1])
+    exrisk.red.sum.abs.sd <- rep(0, dim(weightm)[1])
     cb.total <- rep(0, dim(weightm)[1])
+    cb.sd <- rep(0, dim(weightm)[1])
     oc.total <- rep(0, dim(weightm)[1])
+    oc.sd <- rep(0, dim(weightm)[1])
     area.rest <- rep(0, dim(weightm)[1])
     
     for (w in 1:dim(weightm)[1]){
       load(file=paste0(outdir, scen, "_res.exrisk_w_", w, ".RData"))
+      load(file=paste0(outdir, scen, "_res.exrisk.sd_w_", w, ".RData"))
       nsteps <- dim(res.exrisk)[2]
-      exrisk.mean[w] <- mean(res.exrisk[,nsteps])
+      #exrisk.mean[w] <- mean(res.exrisk[,nsteps])
       exrisk.sum[w] <- sum(res.exrisk[,nsteps])
-      exrisk.red.mean.abs[w] <-  mean(exrisk.t0 - res.exrisk[,nsteps]) * const_bd
+      #exrisk.red.mean.abs[w] <-  mean(exrisk.t0 - res.exrisk[,nsteps]) * const_bd
       exrisk.red.sum.abs[w] <-  sum(exrisk.t0 - res.exrisk[,nsteps]) * const_bd
+      exrisk.red.sum.abs.sd[w] <-  sum(sqrt( (exrisk.t0.sd^2) + (res.exrisk[,nsteps]^2) )) * const_bd
       #exrisk.red.mean.prop[w] <-  mean((exrisk.t0 - res.exrisk[,nsteps]) / exrisk.t0)
       
       load(file=paste0(outdir, scen, "_res.total.restored.pu_w_", w, ".RData"))
       cb.total[w] <- sum(cb * res.total.restored.pu * A * const_cb)
+      cb.sd[w] <- sqrt(sum( (cb.sd^2) * ((res.total.restored.pu * A * const_cb)^2) ))
       oc.total[w] <- sum(oc * res.total.restored.pu * A * const_oc)
+      oc.sd[w] <- sqrt(sum( (oc.sd^2) * ((res.total.restored.pu * A * const_oc)^2) ))
       area.rest[w] <- sum(res.total.restored.pu * A * const_area)
     }
     
+#    df <- data.frame(scenario=rep(scen, dim(weightm)[1]), weightcb=weightm[,1],
+#                     weightbd=weightm[,2], exrisk.mean, exrisk.sum,
+#                     exrisk.red.mean.abs, exrisk.red.sum.abs,
+#                     cb.total, oc.total, area.rest)
     df <- data.frame(scenario=rep(scen, dim(weightm)[1]), weightcb=weightm[,1],
-                     weightbd=weightm[,2], exrisk.mean, exrisk.sum,
-                     exrisk.red.mean.abs, exrisk.red.sum.abs,
-                     cb.total, oc.total, area.rest)
+                     weightbd=weightm[,2], exrisk.sum, exrisk.red.sum.abs,
+                     exrisk.red.sum.abs.sd, cb.total, cd.sd, oc.total, oc.sd,
+                     area.rest)
+    
     
   } else {
     w <- "1"
     load(file=paste0(dir, "exrisk.t0.RData"))
+    load(file=paste0(dir, "exrisk.t0.sd.RData"))
     load(file=paste0(dir, "cb.RData"))
+    load(file=paste0(dir, "cb-sd.RData"))
     load(file=paste0(dir, "ocg.RData"))
+    load(file=paste0(dir, "ocg-sd.RData"))
     load(file=paste0(dir, "occ.RData"))
+    load(file=paste0(dir, "occ-sd.RData"))
     load(file=paste0(dir, "prop.crop.RData"))
     load(file=paste0(dir, "prop.cultg.RData"))
     oc <- (prop.crop / (prop.crop + prop.cultg)) * occ +
       (prop.cultg / (prop.crop + prop.cultg)) * ocg 
     
     load(file=paste0(outdir, scen, "_res.exrisk_w_", w, ".RData"))
+    load(file=paste0(outdir, scen, "_res.exrisk.sd_w_", w, ".RData"))
     nsteps <- dim(res.exrisk)[2]
-    exrisk.mean <- mean(res.exrisk[,nsteps])
+    #exrisk.mean <- mean(res.exrisk[,nsteps])
     exrisk.sum <- sum(res.exrisk[,nsteps])
-    exrisk.red.mean.abs <-  mean(exrisk.t0 - res.exrisk[,nsteps]) * const_bd
+    #exrisk.red.mean.abs <-  mean(exrisk.t0 - res.exrisk[,nsteps]) * const_bd
     exrisk.red.sum.abs <-  sum(exrisk.t0 - res.exrisk[,nsteps]) * const_bd
+    exrisk.red.sum.abs.sd <-  sum(sqrt( (exrisk.t0.sd^2) + (res.exrisk[,nsteps]^2) )) * const_bd
     load(file=paste0(outdir, scen, "_res.total.restored.pu_w_", w, ".RData"))
     cb.total <- sum(cb * res.total.restored.pu * A * const_cb)
+    cb.sd <- sqrt(sum( (cb.sd^2) * ((res.total.restored.pu * A * const_cb)^2) ))
     oc.total <- sum(oc * res.total.restored.pu * A * const_oc)
+    oc.sd <- sqrt(sum( (oc.sd^2) * ((res.total.restored.pu * A * const_oc)^2) ))
     area.rest <- sum(res.total.restored.pu * A * const_area)
     
-    df <- data.frame(scenario=scen, weightcb=NA, weightbd=NA, exrisk.mean,
-                     exrisk.sum, exrisk.red.mean.abs, exrisk.red.sum.abs,
-                     cb.total, oc.total, area.rest)
+#    df <- data.frame(scenario=scen, weightcb=NA, weightbd=NA, exrisk.mean,
+#                     exrisk.sum, exrisk.red.mean.abs, exrisk.red.sum.abs,
+#                     cb.total, oc.total, area.rest)
+    df <- data.frame(scenario=rep(scen, dim(weightm)[1]), weightcb=weightm[,1],
+                     weightbd=weightm[,2], exrisk.sum, exrisk.red.sum.abs,
+                     exrisk.red.sum.abs.sd, cb.total, cd.sd, oc.total, oc.sd,
+                     area.rest)
   }
   
   save(df, file=paste0(outdir, scen, "_results_df.RData"))

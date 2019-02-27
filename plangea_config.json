@@ -9,16 +9,20 @@
 		"variable_names": ["cb", "bd", "oc"],   
 		"ready_variables": [true, false, true],  
 		"variable_types": ["B", "B", "C"],  
-		"variable_weights": [1, [1, 10, 100, 1000], 1], 
+		"variable_weights": [1, [1, 10, 100, 1000], 1],
+		"variable_scaling_factor": [1e-3, 1e2, 1e-4],
 		"variables_folder": "./variables/",
 		"variable_raster_names": ["carbon.tif", "", "opportunity_costs.tif"]
 	},
 
-	"land-use_classes": {
-		"class_names": ["FOR", "NGR", "SHR", "DES", "WET", "AGR", "CGR", "PFO", "WAT", "NRE"],
-		"class_types": ["N", "N", "N", "N", "N", "A", "A", "A", "I", "I"],  
-		"class_folder": "./land-use/",
-		"classes_raster_names": ["forest.tif", "nat_grassland.tif", "shrubland.tif", "desert.tif", "wetland.tif", "cult_grassland.tif", "planted_forest.tif", "water_bodies.tif", "non-restorable.tif"]
+	"landscape_features": {
+	  "land-use":{
+	    "class_names": ["FOR", "NGR", "SHR", "DES", "WET", "AGR", "CGR", "PFO", "WAT", "NRE"],
+	  	"class_types": ["N", "N", "N", "N", "N", "A", "A", "A", "I", "I"],  
+	  	"class_folder": "./land-use/",
+	  	"classes_raster_names": ["forest.tif", "nat_grassland.tif", "shrubland.tif", "desert.tif", "wetland.tif", "cult_grassland.tif", "planted_forest.tif", "water_bodies.tif", "non-restorable.tif"]  
+	  },
+	  "area_scaling_factor": 1e-4
 	},
 
 	"scenarios": {
@@ -28,13 +32,14 @@
 		"nsteps_per_benchmark": [1, 10, 1, 10, 1, 10, 10],
 		"target_names": ["BONN", "NYDC", "CTRY", "CBD", "CBD2", "WRLD"],
 		"targets": ["1.5e6", "3.5e6", "13.3719e6", "12.7e6", "25.4e6", "8466e6"],
-			"sub-region_scenarios": {
+		"sub-region_scenarios": {
 			"include_subregion_scenarios": true,
 			"sub-region_folder": "",
 			"sub-region_raster_name": "countries-code.tif",
 			"sub-region_names_table": "countries-code.csv",
 			"sub-region_flat_targets": false,
 			"sub-region_targets": "restoration-constraints-per-country-total.csv" 
+		},
+		"upper_bounds_limits": [0.33, 0.67, 1]
 		}
-	}
 }

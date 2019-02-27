@@ -63,9 +63,6 @@
 # time I tried to run "scen_rnd", but I haven't checked if they corrected the
 # random allocation scenario as well.
 
-home.dir = '~/Documents/IIS_PROJECTS/plangea-legacy/'
-setwd(home.dir)
-
 
 # PRE-PROCESSING (INCLUDING AUXILIARY ANALYSES: OA AND OPPORTUNITY COSTS) ######
 #source('preprocessing.r', echo=T)
