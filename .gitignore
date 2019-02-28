@@ -1,0 +1,10 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+.Rproj
+
+inputdata_v8/
+display_results_*/
+opt_results_*/

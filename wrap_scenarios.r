@@ -23,29 +23,9 @@ rest.area = list(BONN=1.5e6, NYDC=3.5e6, CTRY=13.3719e6,
                  CBD2 = 0.30*sum((prop.crop + prop.cultg)*A),
                  WRLD = sum((prop.crop + prop.cultg)*A))
 
-
-# Limits to restoration per country ############################################
-
-# Reading raster with countries, and corresponding csv with country IDs
-world.ras = raster(paste0(dir,'countries-code.tif'))
-world.csv = read.csv(paste0(dir, 'countries-code.csv'))
-
-# Sub-setting a country (ex. Brazil, code 33)
-# br_index = (world.ras==33)
-# br.ptr = (master_index %in% br_index)
-# cb.br = cb[br.ptr]
-
-
-# Obtaining country ID of pixels in master_index
-world.vals = world.ras[master_index]
-
-# Coefficients for constraint equations pointing to pixels pertaining to each country
-country.coefs = matrix(t(sapply(world.csv$CODE,
-                                function(x){as.integer(world.vals==x)})),
-                       nrow=length(world.csv$CODE))
-
-# Adding entry in country.coefs pointing to all px in master_index (to enable use of global constraints)
-country.coefs = rbind(country.coefs, rep(1,np))
+# Load large country.coefs matrix only if needed
+country.coefs = c()
+if (2 %in% ublim.cty.range){load(country.coefs)}
 
 # Contraint equation coefficients
 constr.list = list(unconstrained = matrix(g_scalar_area, nrow=1, ncol=np),

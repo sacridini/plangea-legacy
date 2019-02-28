@@ -21,6 +21,7 @@ res.total.restored.pu <- rep(0, np)
 res.area.restored.spp <- matrix(0, nrow=ns, ncol=nsteps)
 res.total.restored.spp <- rep(0, ns)
 res.exrisk <- matrix(0, nrow=ns, ncol=nsteps)
+res.exrisk.sd <- matrix(0, nrow=ns, ncol=nsteps)
 res.objval <- rep(0, nsteps)
 
 res.grad = res.total.restored.pu
@@ -112,6 +113,7 @@ for (s in 1:nsteps){
 		exrisk.slope <- calc.extinction.slope(habarea.t0 + delta.hab.spp, habarea.max, z=0.25)
 		#exrisk.ts <- extinction.risk(habarea.t0 + delta.hab.spp, habarea.max, z=0.25)
 		res.exrisk[,s] <- extinction.risk(habarea.t0 + delta.hab.spp, habarea.max, z=0.25)
+		res.exrisk.sd[,s] <- extinction.risk.sd(habarea.t0 + delta.hab.spp, habarea.max, z=0.25, z.sd=z.sd)
 
 
 		# reclaculate bd benefit

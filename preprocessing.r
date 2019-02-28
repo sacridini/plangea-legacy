@@ -25,12 +25,12 @@ library(raster)
 # set folder into which all pre-processed datasets will be written or
 # overwritten if they already exist, must end with a /, and must already exist
 # on disk
-dir = 'inputdata_v6/'
+dir = 'inputdata_v8/'
 if (!dir.exists(dir)) dir.create(dir)
 
 setwd('~/Documents/IIS_PROJECTS/global_rest_prior/global_rest_priorization/')
 
-source("functions.r")
+source("~/Documents/IIS_PROJECTS/plangea-legacy/functions.r")
 
 ### LOAD BASE RASTERS
 
@@ -529,17 +529,8 @@ summary(occ.d)
 occ.diff = abs((occ.d - occ) / 1.e-6)
 ocg.diff = abs((ocg.d - ocg) / 1.e-6)
 
-# SD on opportunity costs propagated from uncertainty on the Discount Rate
-DR.sd = 0.01
-
-occ.sd = sqrt((occ.diff^2) * (DR.sd^2))
-summary(occ.sd)
-
-ocg.sd = sqrt((ocg.diff^2) * (DR.sd^2))
-summary(ocg.sd)
-
-save(occ.sd, file=paste0(dir, "occ-sd.RData"))
-save(ocg.sd, file=paste0(dir, "ocg-sd.RData"))
+save(occ.diff, file=paste0(dir, "occ.diff.RData"))
+save(ocg.diff, file=paste0(dir, "ocg.diff.RData"))
 
 
 
@@ -1192,7 +1183,30 @@ v <- values(r.cntry)[master_index]
 table(v)
 
 
+# Limits to restoration per country ############################################
 
+# Reading raster with countries, and corresponding csv with country IDs
+world.ras = raster(paste0(dir,'countries-code.tif'))
+world.csv = read.csv(paste0(dir, 'countries-code.csv'))
+
+# Sub-setting a country (ex. Brazil, code 33)
+# br_index = (world.ras==33)
+# br.ptr = (master_index %in% br_index)
+# cb.br = cb[br.ptr]
+
+
+# Obtaining country ID of pixels in master_index
+world.vals = world.ras[master_index]
+
+# Coefficients for constraint equations pointing to pixels pertaining to each country
+country.coefs = matrix(t(sapply(world.csv$CODE,
+                                function(x){as.integer(world.vals==x)})),
+                       nrow=length(world.csv$CODE))
+
+# Adding entry in country.coefs pointing to all px in master_index (to enable use of global constraints)
+country.coefs = rbind(country.coefs, rep(1,length(master_index)))
+
+save(country.coefs, file=paste0(dir, "country.coefs.RData"))
 
 
 

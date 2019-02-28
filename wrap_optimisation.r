@@ -74,6 +74,8 @@
 # SCENARIO BLOCK 1: OVERALL-RESTORATION LIMITS ONLY ############################
 info = F
 print.steps = F
+z.sd = 0.05
+DR.sd = 0.01
 ub.perc.constraint = 1
 ublim.suffix = ''
 ublim.cty.range = 1
@@ -91,6 +93,8 @@ gc()
 # SCENARIO BLOCK 2: COUNTRY LIMITS TO RESTORATION ##############################
 info = T
 print.steps = T
+z.sd = 0.05
+DR.sd = 0.01
 wrld.form = 1
 ub.perc.constraint = 1
 #ublim.suffix = paste0('-ublim_',round(ub.perc.constraint,2))
@@ -127,6 +131,8 @@ gc()
 # SCENARIO BLOCK 3: STEP-WISE GLOBAL RESTORATION GRADIENT ######################
 info = T
 print.steps = T
+z.sd = 0.05
+DR.sd = 0.01
 ub.perc.constraint = 1
 wrld.suffix = c('cb-bd-oc', 'cb', 'bd', 'oc')
 wrld.res.df = c()
@@ -165,6 +171,8 @@ gc()
 #load("allscenarios_results.df.RData")
 info = F # Should plots be printed with diagnostics info?
 print.steps = F
+z.sd = 0.05
+DR.sd = 0.01
 ub.perc.vals = seq(from=0.15, to=0.95, by=0.1)
 
 for (ub.perc.constraint in ub.perc.vals){
@@ -178,10 +186,4 @@ for (ub.perc.constraint in ub.perc.vals){
 rm(list=ls(all=T))
 Sys.sleep(1)
 gc()
-
-
-
-# SCENARIO BLOCK 5: SENSITIVITY ANALYSIS #######################################
-
-z.sens = c(.15, .25, .35)
 

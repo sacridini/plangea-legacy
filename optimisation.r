@@ -36,7 +36,7 @@ setwd(home.dir)
 source("functions.r")
 
 # set the input directory from which to load all the data for the optimisation
-dir <- '/home/alvaro/Documents/IIS_PROJECTS/global_rest_prior/global_rest_priorization/inputdata_v6/'
+dir <- 'inputdata_v8/'
 
 #scp ~/Documents/proj/iis_global_spp/inputdata_v1/species_index_list.RData 10.12.193.171:/home/hbeyer/Documents/proj/iis_global_spp/inputdata_v1/
 
@@ -71,8 +71,13 @@ summary(cb)
 
 load(file=paste0(dir, "ocg.RData"))
 load(file=paste0(dir, "occ.RData"))
+load(file=paste0(dir, "occ.diff.RData"))
+load(file=paste0(dir, "ocg.diff.RData"))
 load(file=paste0(dir, "cntry.RData"))
 load(file=paste0(dir, "A.RData"))
+
+# Load standard deviation of carbon
+load(file=paste0(dir, "cb-sd.RData"))
 
 # proportion of ag and pasture
 load(file=paste0(dir, "prop.crop.RData"))
@@ -136,7 +141,8 @@ g_scalar_bd <- 1E2
 #    1928    3771    5299    6075    6635  100516
 g_scalar_oc <- 1E-3
 
-# we need to be very careful about numerical issues arising from large values like target areas in the constraits too
+# we need to be very careful about numerical issues arising from large values
+# like target areas in the constraits too
 g_scalar_area <- 1E-4
 
 g_diagnostic_plots <- TRUE
@@ -150,11 +156,30 @@ summary(cb)
 cb <- cb * g_scalar_cb
 summary(cb)
 
+cb.sd = cb.sd * g_scalar_cb
+
 # for now, calculate oc as the weighted average of occ and ocg:
 oc <- (prop.crop / (prop.crop + prop.cultg)) * occ + (prop.cultg / (prop.crop + prop.cultg)) * ocg 
 summary(oc)
 oc <- oc * g_scalar_oc
 summary(oc)
+
+
+# OC standard deviation
+
+# SD on opportunity costs propagated from uncertainty on the Discount Rate
+
+occ.sd = sqrt((occ.diff^2) * (DR.sd^2))
+summary(occ.sd)
+
+ocg.sd = sqrt((ocg.diff^2) * (DR.sd^2))
+summary(ocg.sd)
+
+oc.sd = sqrt(
+  ((prop.crop / (prop.crop + prop.cultg))^2) * (occ.sd^2) +
+    ((prop.cultg / (prop.crop + prop.cultg))^2) * (ocg.sd^2)
+) * g_scalar_oc
+
 
 # calculate initial bd value
 # note that g_scalar_bd is applied within the calc.bd function

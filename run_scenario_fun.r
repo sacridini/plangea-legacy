@@ -55,6 +55,7 @@ s = 1
       save(res.area.restored.spp, file=paste0(outdir, scen, "_res.area.restored.spp_w_", w, ".RData"))
       save(res.total.restored.spp, file=paste0(outdir, scen, "_res.total.restored.spp_w_", w, ".RData"))
       save(res.exrisk, file=paste0(outdir, scen, "_res.exrisk_w_", w, ".RData"))
+      save(res.exrisk.sd, file=paste0(outdir, scen, "_res.exrisk.sd_w_", w, ".RData"))
       
       # Species list results
       res.spp = base.spp.list
@@ -114,7 +115,7 @@ s = 1
       res.area.restored.spp[,1] <- delta.hab.spp
       res.total.restored.spp <- res.total.restored.spp + delta.hab.spp
       res.exrisk[,1] <- extinction.risk(habarea.t0 + res.total.restored.spp, habarea.max, z=0.25)
-      res.exrisk.sd[,1] <- extinction.risk.sd(habarea.t0 + res.total.restored.spp, habarea.max, z=0.25, z.sd=0.1)
+      res.exrisk.sd[,1] <- extinction.risk.sd(habarea.t0 + res.total.restored.spp, habarea.max, z=0.25, z.sd=z.sd)
       res.prop.restored.pu[,1] <- result$x
       res.total.restored.pu <- result$x
       # Saving objects
