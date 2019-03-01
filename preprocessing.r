@@ -53,6 +53,10 @@ r.ocg <- raster("./rawdata/5km/others/opportunity_costs_grassland_4.9km_Molweide
 r.occ.d = raster('./rawdata/5km/others/opportunity_costs_cropland_add-eps-DR_4.9km_Molweide.tif')
 r.ocg.d = raster('./rawdata/5km/others/opportunity_costs_grassland_add-eps-DR_4.9km_Molweide.tif')
 
+# opportunity cost variations under Discount Rate epsilon of 1.e-6
+r.occ.p = raster('./rawdata/5km/others/eps-varprice-opportunity_costs_cropland_4.9km_Molweide.tif')
+r.ocg.p = raster('./rawdata/5km/others/eps-varprice-opportunity_costs_grassland_4.9km_Molweide.tif')
+
 # carbon
 #r.cb <- raster("Erb_et_al_Fig4A_Resampled/ExtDat_Fig4A_gcm_reamostrado.tif")
 #r.cb <- raster("carbon/Soil_C_delta_mollweide_aligned_FINAL.tif")
@@ -525,13 +529,33 @@ length(which(occ.d == 0))
 if (length(which(occ.d == 0)) > 0) occ.d <- replace(occ.d, which(occ.d == 0), min(occ.d[which(!occ.d==0)]))
 summary(occ.d)
 
-# Differentials of opportunity costs w.r.t. Discount Rate
-occ.diff = abs((occ.d - occ) / 1.e-6)
-ocg.diff = abs((ocg.d - ocg) / 1.e-6)
+ocg.p <- values(r.ocg.p)[master_index]
+summary(ocg.p)
+if (length(which(is.na(ocg.p))) > 0) ocg.p <- replace(ocg.p, which(is.na(ocg.p)), mean(ocg.p, na.rm=T))
+length(which(ocg.p == 0))
+if (length(which(ocg.p == 0)) > 0) ocg.p <- replace(ocg.p, which(ocg.p == 0), min(ocg.p[which(!ocg.p==0)]))
+summary(ocg.p)
 
-save(occ.diff, file=paste0(dir, "occ.diff.RData"))
-save(ocg.diff, file=paste0(dir, "ocg.diff.RData"))
+occ.p <- values(r.occ.p)[master_index]
+summary(occ.p)
+if (length(which(is.na(occ.p))) > 0) occ.p <- replace(occ.p, which(is.na(occ.p)), mean(occ.p, na.rm=T))
+length(which(occ.p == 0))
+if (length(which(occ.p == 0)) > 0) occ.p <- replace(occ.p, which(occ.p == 0), min(occ.p[which(!occ.p==0)]))
+summary(occ.p)
 
+
+# Differentials of opportunity costs w.r.t. Discount Rate / price
+occ.diff.DR = abs((occ.d - occ) / 1.e-6)
+ocg.diff.DR = abs((ocg.d - ocg) / 1.e-6)
+
+save(occ.diff.DR, file=paste0(dir, "occ.diff-DR.RData"))
+save(ocg.diff.DR, file=paste0(dir, "ocg.diff-DR.RData"))
+
+occ.diff.Pr = abs((occ.p - occ) / 1.e-6)
+ocg.diff.Pr = abs((ocg.p - ocg) / 1.e-6)
+
+save(occ.diff.Pr, file=paste0(dir, "occ.diff-Pr.RData"))
+save(ocg.diff.Pr, file=paste0(dir, "ocg.diff-Pr.RData"))
 
 
 ### COUNTRY VALUE

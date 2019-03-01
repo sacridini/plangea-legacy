@@ -74,14 +74,18 @@
 # SCENARIO BLOCK 1: OVERALL-RESTORATION LIMITS ONLY ############################
 info = F
 print.steps = F
-z.sd = 0.05
-DR.sd = 0.01
+z.sd = 0.1
+DR.sd = 0.05
+Pr.relative.var = 0.25
+quad.sd = T
+CL.prt = T
 ub.perc.constraint = 1
 ublim.suffix = ''
 ublim.cty.range = 1
 target.range = 4
 bench.range = 1:7
 overwrite.nsteps = 5
+#wgt.range = 1
 source("optimisation.r")
 
 rm(list=ls(all=T))
@@ -93,8 +97,11 @@ gc()
 # SCENARIO BLOCK 2: COUNTRY LIMITS TO RESTORATION ##############################
 info = T
 print.steps = T
-z.sd = 0.05
-DR.sd = 0.01
+z.sd = 0.1
+DR.sd = 0.05
+Pr.relative.var = 0.25
+quad.sd = T
+CL.prt = T
 wrld.form = 1
 ub.perc.constraint = 1
 #ublim.suffix = paste0('-ublim_',round(ub.perc.constraint,2))
@@ -103,8 +110,8 @@ ublim.suffix = ifelse(exists('flat.ctrylim'), paste0('-ctrylim_',flat.ctrylim), 
 ublim.cty.range = 2
 target.range = 4
 bench.range = 1:7
+overwrite.nsteps = 5
 #wgt.range = 1
-#overwrite.nsteps = 1
 
 for (flat.ctrylim in flat.ctrylim.vals){
   source("optimisation.r")
@@ -133,6 +140,9 @@ info = T
 print.steps = T
 z.sd = 0.05
 DR.sd = 0.01
+Pr.relative.var = 0.25
+quad.sd = T
+CL.prt = T
 ub.perc.constraint = 1
 wrld.suffix = c('cb-bd-oc', 'cb', 'bd', 'oc')
 wrld.res.df = c()
@@ -168,22 +178,24 @@ gc()
 
 
 # SCENARIO BLOCK 4: UPPER BOUNDS LIMITED TO FRACTION OF THE CELL ###############
-#load("allscenarios_results.df.RData")
 info = F # Should plots be printed with diagnostics info?
 print.steps = F
-z.sd = 0.05
-DR.sd = 0.01
+z.sd = 0.1
+DR.sd = 0.05
+Pr.relative.var = 0.25
+quad.sd = T
+CL.prt = T
 ub.perc.vals = seq(from=0.15, to=0.95, by=0.1)
+ublim.cty.range = 1
+target.range = 4
+bench.range = 1:7
+overwrite.nsteps = 1
+#wgt.range = 1
 
 for (ub.perc.constraint in ub.perc.vals){
     ublim.suffix = paste0('-ublim_',round(ub.perc.constraint,2))
-    ublim.cty.range = 1
-    target.range = 4
-    bench.range = 1:7
     source("optimisation.r")
 }
 
-rm(list=ls(all=T))
-Sys.sleep(1)
-gc()
+
 

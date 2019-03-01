@@ -18,12 +18,30 @@
 
 #run_scenario_fun = function(bd, cb, oc, scen.form, ub, constr, sense, rhs, nsteps,
 #                        weights, save.name, random=F){
-const_cb <- 1E-7
-const_oc <- 1E-7
-const_area <- 1E-6
-const_bd <- 1E2
-s = 1
 
+# (!!!) Defining constants to be used in the post-processing. In that function,
+# the original values of cb and oc are re-loaded, thus it is not needed to
+# correct oc / cb by their scaling factors (g_scalar_oc, and g_scalar_cb) (!!!)
+
+# Original carbon-map unit is ton/ha, defining constant to convert to ton/sq.km
+const_cb = 1E2
+
+# Converting from ton/sq.km to Mton/sq.km
+const_cb = const_cb * 1E-6
+
+# Original opportunity costs unit is USD/ha, defining constant to convert to USD/sq.km
+const_oc = 1E2
+
+# Converting from USD/sq.km to million USD/sq.km
+const_oc = const_oc * 1E-6
+
+# Area A already given in sq.km, converting to million sq.km
+const_area = 1E-6
+
+const_bd <- g_scalar_bd
+
+
+s = 1
   if (!random){
     for (w in 1:n.weights){
       w.cb = unlist(weights['w.cb'])[[w]]
@@ -78,6 +96,8 @@ s = 1
     if(!exists("results.df")){results.df = c()}
     results.df = rbind(results.df,
                        postprocess.results(dir, outdir, scen=save.name,
+                                           quad.sd=quad.sd,
+                                           print.confidence=CL.prt,
                                            hasweights=((n.weights>1))))
   } else {
     niters = nsteps
@@ -135,6 +155,8 @@ s = 1
         rnd.df = rbind(rnd.df,
                        postprocess.results(dir, outdir,
                                            paste0(save.name, ri),
+                                           quad.sd = quad.sd,
+                                           print.confidence=CL.prt,
                                            hasweights=FALSE))
       }
       rnd.mean = scen #rnd.df[1,]

@@ -69,10 +69,14 @@ load(file=paste0(dir, "cb.RData"))
 cb <- cb + abs(min(cb, na.rm=T)) + 1
 summary(cb)
 
+# Loading Opportunity cost values
 load(file=paste0(dir, "ocg.RData"))
 load(file=paste0(dir, "occ.RData"))
-load(file=paste0(dir, "occ.diff.RData"))
-load(file=paste0(dir, "ocg.diff.RData"))
+load(file=paste0(dir, "occ.diff-DR.RData"))
+load(file=paste0(dir, "ocg.diff-DR.RData"))
+load(file=paste0(dir, "occ.diff-Pr.RData"))
+load(file=paste0(dir, "ocg.diff-Pr.RData"))
+
 load(file=paste0(dir, "cntry.RData"))
 load(file=paste0(dir, "A.RData"))
 
@@ -161,6 +165,8 @@ cb.sd = cb.sd * g_scalar_cb
 # for now, calculate oc as the weighted average of occ and ocg:
 oc <- (prop.crop / (prop.crop + prop.cultg)) * occ + (prop.cultg / (prop.crop + prop.cultg)) * ocg 
 summary(oc)
+
+# Rescaling OC to be input to solver
 oc <- oc * g_scalar_oc
 summary(oc)
 
@@ -169,10 +175,10 @@ summary(oc)
 
 # SD on opportunity costs propagated from uncertainty on the Discount Rate
 
-occ.sd = sqrt((occ.diff^2) * (DR.sd^2))
+occ.sd = sqrt(((occ.diff.Pr^2) * ((Pr.relative.var*median(occ))^2)) + ((occ.diff.DR^2) * (DR.sd^2)))
 summary(occ.sd)
 
-ocg.sd = sqrt((ocg.diff^2) * (DR.sd^2))
+ocg.sd = sqrt(((ocg.diff.Pr^2) * ((Pr.relative.var*median(ocg))^2)) + ((ocg.diff.DR^2) * (DR.sd^2)))
 summary(ocg.sd)
 
 oc.sd = sqrt(
