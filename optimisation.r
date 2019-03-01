@@ -175,10 +175,10 @@ summary(oc)
 
 # SD on opportunity costs propagated from uncertainty on the Discount Rate
 
-occ.sd = sqrt(((occ.diff.Pr^2) * ((Pr.relative.var*median(occ))^2)) + ((occ.diff.DR^2) * (DR.sd^2)))
+occ.sd = sqrt(((occ.diff.Pr^2) * ((PrC.relative.var*median(occ))^2)) + ((occ.diff.DR^2) * (DR.sd^2)))
 summary(occ.sd)
 
-ocg.sd = sqrt(((ocg.diff.Pr^2) * ((Pr.relative.var*median(ocg))^2)) + ((ocg.diff.DR^2) * (DR.sd^2)))
+ocg.sd = sqrt(((ocg.diff.Pr^2) * ((PrG.relative.var*median(ocg))^2)) + ((ocg.diff.DR^2) * (DR.sd^2)))
 summary(ocg.sd)
 
 oc.sd = sqrt(

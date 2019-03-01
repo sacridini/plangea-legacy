@@ -76,7 +76,8 @@ info = F
 print.steps = F
 z.sd = 0.1
 DR.sd = 0.05
-Pr.relative.var = 0.25
+PrC.relative.var = 0.25
+PrG.relative.var = 0.25
 quad.sd = T
 CL.prt = T
 ub.perc.constraint = 1
@@ -99,14 +100,14 @@ info = T
 print.steps = T
 z.sd = 0.1
 DR.sd = 0.05
-Pr.relative.var = 0.25
+PrC.relative.var = 0.25
+PrG.relative.var = 0.25
 quad.sd = T
 CL.prt = T
 wrld.form = 1
 ub.perc.constraint = 1
 #ublim.suffix = paste0('-ublim_',round(ub.perc.constraint,2))
 flat.ctrylim.vals = c(0.1, 0.2, 0.3)
-ublim.suffix = ifelse(exists('flat.ctrylim'), paste0('-ctrylim_',flat.ctrylim), '-econ-ctrylims_')
 ublim.cty.range = 2
 target.range = 4
 bench.range = 1:7
@@ -114,20 +115,21 @@ overwrite.nsteps = 5
 #wgt.range = 1
 
 for (flat.ctrylim in flat.ctrylim.vals){
+  ublim.suffix = ifelse(exists('flat.ctrylim'), paste0('-ctrylim_',flat.ctrylim), '-econ-ctrylims_')
   source("optimisation.r")
+}
+#  if (exists('flat.ctrylim')){rm(flat.ctrylim)}
   
-  if (exists('flat.ctrylim')){rm(flat.ctrylim)}
-  
-  flat.ctrylim.df = c()
-  for (ns in 1:nsteps){
+#  flat.ctrylim.df = c()
+#  for (ns in 1:nsteps){
     #  load(paste0(outdir, scen, "_step.res_", ns, ".RData"))
     #  step.ras = step.ras + ((nsteps-i) * step.res)
-    flat.ctrylim.df = rbind(flat.ctrylim.df,
-                            postprocess.grad(dir, outdir, ns=ns,
-                                             filename=paste0(scen, "_res.total.restored.pu_step_", ns, ".RData")))
-  }
-  write.csv(flat.ctrylim.df, file=paste0("./display_results_CBD_v8/world_gradient_results",ublim.suffix, ".csv"), row.names=F)
-}
+#    flat.ctrylim.df = rbind(flat.ctrylim.df,
+#                            postprocess.grad(dir, outdir, ns=ns,
+#                                             filename=paste0(scen, "_res.total.restored.pu_step_", ns, ".RData"#)))
+#  }
+#  write.csv(flat.ctrylim.df, file=paste0("./display_results_CBD_v8/world_gradient_results",ublim.suffix, ".csv"), row.names=F)
+#}
 
 rm(list=ls(all=T))
 Sys.sleep(1)
@@ -140,7 +142,8 @@ info = T
 print.steps = T
 z.sd = 0.05
 DR.sd = 0.01
-Pr.relative.var = 0.25
+PrC.relative.var = 0.25
+PrG.relative.var = 0.25
 quad.sd = T
 CL.prt = T
 ub.perc.constraint = 1
@@ -182,7 +185,8 @@ info = F # Should plots be printed with diagnostics info?
 print.steps = F
 z.sd = 0.1
 DR.sd = 0.05
-Pr.relative.var = 0.25
+PrC.relative.var = 0.25
+PrG.relative.var = 0.25
 quad.sd = T
 CL.prt = T
 ub.perc.vals = seq(from=0.15, to=0.95, by=0.1)

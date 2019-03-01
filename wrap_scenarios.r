@@ -25,7 +25,10 @@ rest.area = list(BONN=1.5e6, NYDC=3.5e6, CTRY=13.3719e6,
 
 # Load large country.coefs matrix only if needed
 country.coefs = c()
-if (2 %in% ublim.cty.range){load(country.coefs)}
+if (2 %in% ublim.cty.range){
+  load(paste0(dir,'country.coefs.RData'))
+  world.csv = read.csv(paste0(dir, 'countries-code.csv'))
+  }
 
 # Contraint equation coefficients
 constr.list = list(unconstrained = matrix(g_scalar_area, nrow=1, ncol=np),
@@ -145,7 +148,7 @@ for (sct in sct.range){
       if(exists('wgt.range')){
         weights = as.list(as.data.frame(slist.weights[scb][[1]])[wgt.range,])}
       else {weights = slist.weights[scb][[1]]}
-      if(exists("flat.ctrylim")){weights = slist.weights[5][[1]]}
+      #if(exists("flat.ctrylim")){weights = slist.weights[5][[1]]}
       
       weightm = matrix(unlist(weights), ncol = length(weights))
       save(weightm, file=paste0(outdir, save.name, "_weightm.RData"))
