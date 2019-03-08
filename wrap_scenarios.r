@@ -73,22 +73,26 @@ slist.nsteps = list(1, 1, 10, 10, 10, 10, 1, 30, 20)
 slist.form = list("cb-oc", "cb", "bd-oc", "bd", "cb-bd-oc", "cb-bd", "oc",
                   "rnd", "wrld")
 slist.weights = list(list(w.cb=1,w.bd=1), list(w.cb=1,w.bd=1),
-                    list(w.cb=1,w.bd=1), list(w.cb=1,w.bd=1),
-                    list(w.cb=rep(1,10),
-                         w.bd=c(1, 5, 10, 50, 100, 500, 1000, 5000, 7500, 10000)),
-                    list(w.cb=rep(1,10),
-                         w.bd=c(1, 5, 10, 50, 100, 500, 1000, 5000, 7500, 10000)),
-#
-#                    list(w.cb=c(rep(1,5)),
-#                         w.bd=c(1, 10, 100, 1000, 10000)),
-#                    list(w.cb=c(rep(1,5)),
-#                         w.bd=c(0.1, 0.5, 1.5, 10, 500)),
-#
-#                    list(w.cb=c(rep(1,9),0),
-#                         w.bd=c(0, 1, 4, 10, 40, 100, 400, 1000, 4000, 1)),
-#                    list(w.cb=c(rep(1,8),0),
-#                         w.bd=c(0, 0.1, 0.5, 1.5, 4, 10, 50, 500, 1)),
-                    list(w.cb=1,w.bd=1), 1, list(w.cb=1,w.bd=10))
+                     list(w.cb=1,w.bd=1), list(w.cb=1,w.bd=1),
+                     list(w.cb=c(2,rep(1,9)),
+                          w.bd=c(1, 1, 3, 5, 10, 20, 35, 50, 100, 1000)),
+                     list(w.cb=c(2,rep(1,9)),
+                          w.bd=c(1, 1, 3, 5, 10, 20, 35, 50, 100, 1000)),
+                     #
+                     #                    list(w.cb=c(rep(1,5)),
+                     #                         w.bd=c(1, 10, 100, 1000, 10000)),
+                     #                    list(w.cb=c(rep(1,5)),
+                     #                         w.bd=c(0.1, 0.5, 1.5, 10, 500)),
+                     #
+                     #                    list(w.cb=c(rep(1,9),0),
+                     #                         w.bd=c(0, 1, 4, 10, 40, 100, 400, 1000, 4000, 1)),
+                     #                    list(w.cb=c(rep(1,8),0),
+                     #                         w.bd=c(0, 0.1, 0.5, 1.5, 4, 10, 50, 500, 1)),
+                     #list(w.cb=1,w.bd=1), 1, list(w.cb=1,w.bd=10)
+                     list(w.cb=c(2,rep(1,9)),
+                          w.bd=c(1, 1, 3, 5, 10, 20, 35, 50, 100, 1000)),
+                     list(w.cb=c(2,rep(1,9)),
+                          w.bd=c(1, 1, 3, 5, 10, 20, 35, 50, 100, 1000)))
 #slist.w = list('NA', 'NA', 'NA', 'NA', 1:10, 1:9, 'NA', 'NA')
 
 names(slist.names) = slist.form; names(slist.sense) = slist.form

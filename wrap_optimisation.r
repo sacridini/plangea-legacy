@@ -107,7 +107,7 @@ CL.prt = T
 wrld.form = 1
 ub.perc.constraint = 1
 #ublim.suffix = paste0('-ublim_',round(ub.perc.constraint,2))
-flat.ctrylim.vals = c(0.1, 0.2, 0.3)
+flat.ctrylim.vals = seq(from=0.15, to=0.95, by=0.1)
 ublim.cty.range = 2
 target.range = 4
 bench.range = 1:7
@@ -147,7 +147,7 @@ PrG.relative.var = 0.25
 quad.sd = T
 CL.prt = T
 ub.perc.constraint = 1
-wrld.suffix = c('cb-bd-oc', 'cb', 'bd', 'oc')
+wrld.suffix = c('cb-bd', 'cb-bd-oc', 'bd', 'bd-oc', 'cb', 'cb-oc', 'oc')
 wrld.res.df = c()
 
 for (wrld.loop in wrld.suffix){

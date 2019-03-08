@@ -11,7 +11,7 @@ rcompose = function(in.ras, ext=r.ext){
 }
 
 calc.objective.function <- function(form, bd, cb, oc, w.cb=1, w.bd=1, wrld.form=NULL){
-  if (form == 'wrld') {form = c('cb-bd-oc', 'cb', 'bd', 'oc')[wrld.form]}
+  if (form == 'wrld') {form = c('cb-bd', 'cb-bd-oc', 'bd', 'bd-oc', 'cb', 'cb-oc', 'oc')[wrld.form]}
   #print(form)
   if (form == "cb-bd"){
     return((w.cb * cb) + (w.bd * bd))
