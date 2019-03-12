@@ -149,6 +149,7 @@ calc.bd.sd <- function(A, Amax, z=0.25, z.sd=0.01){
 }
 
 
+
 # function to calculate extinction risk
 # A: current area
 # Amax: maximum potential area

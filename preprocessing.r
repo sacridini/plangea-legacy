@@ -1233,12 +1233,36 @@ country.coefs = rbind(country.coefs, rep(1,length(master_index)))
 save(country.coefs, file=paste0(dir, "country.coefs.RData"))
 
 
+# Yield Gaps
+gap.agr = extend(raster('./rawdata/5km/others/areascropcomgap2000_ilhas.tif'),
+                 r.terr, value=0)
 
+# According to table of yield ratio from GAEZ
+gap.agr[gap.agr==1] = 1 - ((0 + 0.1) / 2)
+gap.agr[gap.agr==2] = 1 - ((0.1 + 0.25) / 2)
+gap.agr[gap.agr==3] = 1 - ((0.25 + 0.40) / 2)
+gap.agr[gap.agr==4] = 1 - ((0.4 + 0.55) / 2)
+gap.agr[gap.agr==5] = 1 - ((0.55 + 0.70) / 2)
+gap.agr[gap.agr==6] = 1 - ((0.70 + 0.85) / 2)
+gap.agr[gap.agr==7] = 1 - ((0.85 + 1) / 2)
 
+gap.agr = gap.agr[master_index]
 
+gap.grs = raster('./rawdata/5km/others/yield_gap_grasslands.tif')
 
+gap.grs = gap.grs[master_index]
+gap.grs[is.na(gap.grs)] = 0
 
+save(gap.agr, file='./inputdata_v8/gap.agr.RData')
+save(gap.grs, file='./inputdata_v8/gap.grs.RData')
 
+econ.ub = gap.agr * prop.crop + gap.grs * prop.cultg
+
+econ.ctrylims = world.csv
+
+econ.ctrylims$SQKM = sapply(world.csv$CODE, function(x){sum(as.numeric(world.vals==x) * econ.ub * A)})
+
+save(econ.ctrylims, file='./inputdata_v8/econ.ctrylims.RData')
 
 
 

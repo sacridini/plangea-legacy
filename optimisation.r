@@ -87,6 +87,15 @@ load(file=paste0(dir, "cb-sd.RData"))
 load(file=paste0(dir, "prop.crop.RData"))
 load(file=paste0(dir, "prop.cultg.RData"))
 
+# gap yields
+gap.agr = 1 ; gap.grs = 1
+if (econ.ub){
+  load(file=paste0(dir, "gap.agr.RData"))
+  load(file=paste0(dir, "gap.grs.RData"))
+}
+
+if (econ.ctrylim){load(file=paste0(dir, "econ.ctrylims.RData"))}
+
 # proportions of 5 nat veg types when restoration occurs
 load(file=paste0(dir, "prop.restore.RData"))
 
@@ -226,7 +235,7 @@ summary(bd)
 load(paste0(dir, "terrestrial_lands.RData"))
 
 # upper bound cannot exceed area available for restoration:
-ub <- (prop.crop + prop.cultg) * ub.perc.constraint
+ub = (gap.agr * prop.crop + gap.grs * prop.cultg) * ub.perc.constraint
 
 
 

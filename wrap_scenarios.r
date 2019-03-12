@@ -40,22 +40,27 @@ ctry.lims = read.csv(paste0(dir, 'restoration-constraints-per-country.csv'))
 # Shaving-off unnecessary data from the table
 ctry.lims = ctry.lims[-length(ctry.lims[,1]),c(1,length(ctry.lims[1,]))]
 
+# Correcting country limits units from ha to sq.km
+ctry.lims$total =  ctry.lims$total / 100 
+
+if (econ.ctrylim){ctry.lims$total = econ.ctrylims$SQKM}
+
 # Builds country limits depending on flat.ctrylim from wrap_optimisation
-if (exists('flat.ctrylim')){
-  ctry.lims$total = sapply(world.csv$CODE, function(x){flat.ctrylim * sum(country.coefs[x,] * (prop.crop + prop.cultg) * A)})
-} else {
+if (exists('flat.ctrylim')){ctry.lims$total = flat.ctrylim * ctry.lims$total}
+  #ctry.lims$total = sapply(world.csv$CODE, function(x){flat.ctrylim * sum(country.coefs[x,] * (gap.agr*prop.crop + gap.grs*prop.cultg) * A)})
+#} else {
   # Computing overall sparable land vs demanded land
-  dem.lnd = sum(ctry.lims$total[ctry.lims$total>0])
-  spa.lnd = sum(ctry.lims$total[ctry.lims$total<=0])
+#  dem.lnd = sum(ctry.lims$total[ctry.lims$total>0])
+#  spa.lnd = sum(ctry.lims$total[ctry.lims$total<=0])
   
   # Correcting limits to restoration to account for compensation of demanded area
-  ctry.lims$total[ctry.lims$total>0] = 0
-  ctry.lims$total = ctry.lims$total * ((dem.lnd+spa.lnd)/spa.lnd)
-  ctry.lims$total = -ctry.lims$total
-  
+#  ctry.lims$total[ctry.lims$total>0] = 0
+#  ctry.lims$total = ctry.lims$total * ((dem.lnd+spa.lnd)/spa.lnd)
+#  ctry.lims$total = -ctry.lims$total
+#  
   # Correcting country limits units from ha to sq.km
-  ctry.lims$total =  ctry.lims$total / 100 
-}
+#  ctry.lims$total =  ctry.lims$total / 100 
+#}
 
 # Constrained-scenario (scc) suffix
 suffix.list = list(unconstrained = "", country.limits = "")
@@ -91,6 +96,7 @@ slist.weights = list(list(w.cb=1,w.bd=1), list(w.cb=1,w.bd=1),
                      #list(w.cb=1,w.bd=1), 1, list(w.cb=1,w.bd=10)
                      list(w.cb=c(2,rep(1,9)),
                           w.bd=c(1, 1, 3, 5, 10, 20, 35, 50, 100, 1000)),
+                     1,
                      list(w.cb=c(2,rep(1,9)),
                           w.bd=c(1, 1, 3, 5, 10, 20, 35, 50, 100, 1000)))
 #slist.w = list('NA', 'NA', 'NA', 'NA', 1:10, 1:9, 'NA', 'NA')

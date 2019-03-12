@@ -81,7 +81,9 @@ PrG.relative.var = 0.25
 quad.sd = T
 CL.prt = T
 ub.perc.constraint = 1
-ublim.suffix = ''
+econ.ub = T
+econ.ctrylim = F
+ublim.suffix = ifelse(econ.ub, '-econ-ub_' , '')
 ublim.cty.range = 1
 target.range = 4
 bench.range = 1:7
@@ -106,8 +108,9 @@ quad.sd = T
 CL.prt = T
 wrld.form = 1
 ub.perc.constraint = 1
-#ublim.suffix = paste0('-ublim_',round(ub.perc.constraint,2))
-flat.ctrylim.vals = seq(from=0.15, to=0.95, by=0.1)
+econ.ub = F
+econ.ctrylim = T
+flat.ctrylim.vals = seq(from=0.15, to=0.55, by=0.1)
 ublim.cty.range = 2
 target.range = 4
 bench.range = 1:7
@@ -115,7 +118,11 @@ overwrite.nsteps = 5
 #wgt.range = 1
 
 for (flat.ctrylim in flat.ctrylim.vals){
-  ublim.suffix = ifelse(exists('flat.ctrylim'), paste0('-ctrylim_',flat.ctrylim), '-econ-ctrylims_')
+  econ.ctrylim.suffix = ifelse(econ.ctrylim, '-econ-ctrylims_' ,'')
+  ublim.suffix = ifelse(exists('flat.ctrylim'),
+                        paste0('-ctrylim_', flat.ctrylim, econ.ctrylim.suffix),
+                        econ.ctrylim.suffix)
+  ublim.suffix = paste0(ifelse(econ.ub, '-econ-ub' , ''),ublim.suffix)
   source("optimisation.r")
 }
 #  if (exists('flat.ctrylim')){rm(flat.ctrylim)}
@@ -147,11 +154,14 @@ PrG.relative.var = 0.25
 quad.sd = T
 CL.prt = T
 ub.perc.constraint = 1
+econ.ub = F
+econ.ctrylim = F
 wrld.suffix = c('cb-bd', 'cb-bd-oc', 'bd', 'bd-oc', 'cb', 'cb-oc', 'oc')
 wrld.res.df = c()
 
 for (wrld.loop in wrld.suffix){
   ublim.suffix = paste0('-world_gradient-', wrld.loop)
+  ublim.suffix = paste0(ifelse(econ.ub, '-econ-ub' , ''),ublim.suffix)
   wrld.form = which(wrld.suffix == wrld.loop)
   ublim.cty.range = 1
   target.range = 6
@@ -190,6 +200,8 @@ PrG.relative.var = 0.25
 quad.sd = T
 CL.prt = T
 ub.perc.vals = seq(from=0.15, to=0.95, by=0.1)
+econ.ub = F
+econ.ctrylim = F
 ublim.cty.range = 1
 target.range = 4
 bench.range = 1:7
@@ -198,6 +210,7 @@ overwrite.nsteps = 1
 
 for (ub.perc.constraint in ub.perc.vals){
     ublim.suffix = paste0('-ublim_',round(ub.perc.constraint,2))
+    ublim.suffix = paste0(ifelse(econ.ub, '-econ-ub' , ''),ublim.suffix)
     source("optimisation.r")
 }
 

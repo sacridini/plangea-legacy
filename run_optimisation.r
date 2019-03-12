@@ -149,7 +149,7 @@ for (s in 1:nsteps){
 } # s
 
 # Reset upper boundaries after step-s loop is finished
-ub = (prop.crop + prop.cultg) * ub.perc.constraint
+ub = (gap.agr * prop.crop + gap.grs * prop.cultg) * ub.perc.constraint
 
 #save(res.objval, file=paste0(outdir, scen, "_res.objval_w_", w, ".RData"))
 #save(res.prop.restored.pu, file=paste0(outdir, scen, "_res.prop.restored.pu_w_", w, ".RData"))
