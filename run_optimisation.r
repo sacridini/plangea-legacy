@@ -34,7 +34,7 @@ for (s in 1:nsteps){
 
   print(paste0('Running scenario ', save.name, ' with target ', sct,
                ' (', round(restoration.area, digits=2), ' sq.km). Step: ', s,
-               '/', nsteps, '. Weights ', w, ' (', w.cb, ' CB, ', w.bd,
+               '/', nsteps, '. Weights ', wgt.range[w], ' (', w.cb, ' CB, ', w.bd,
                ' BD). Time elapsed: ', format(round(Sys.time() - start,1))))
   
 	# set up Gurobi model in R
@@ -54,9 +54,12 @@ for (s in 1:nsteps){
 	model$ub[model$ub < model$lb] = model$lb[model$ub < model$lb]
 	rsymphony_bounds = list(lower = list(ind=1:np, val=model$lb),
 	                        upper = list(ind=1:np, val=model$ub))
+	#stop()
+	
 	result = Rsymphony_solve_LP(obj = model$obj, mat = model$A,
 	                            dir = model$sense, rhs = model$rhs,
 	                            bounds = rsymphony_bounds, max=T)
+	
 	names(result)[1] = 'x'
 	if (result$status == 0){result$status = "OPTIMAL"}
 	##############################################################################
@@ -64,7 +67,7 @@ for (s in 1:nsteps){
 	if (result$status == "OPTIMAL"){
 
 		res.objval[s] <- result$objval
-
+		
 		# record the restoration
 		res.prop.restored.pu[,s] <- result$x
 		res.total.restored.pu <- rowSums(res.prop.restored.pu) #res.total.restored.pu + result$x
@@ -82,7 +85,7 @@ for (s in 1:nsteps){
 		                       info=T, area.print=T, step.count=T,
 		                       localize = print.steps)
 		  save(step.res, file=paste0(outdir, scen, "_step.res_", s, ".RData"))
-		  save(res.total.restored.pu, file=paste0(outdir, scen, "_res.total.restored.pu_step_", s, ".RData"))
+		  save(res.total.restored.pu, file=paste0(outdir, scen, '_res.total.restored.pu_w', wgt.range[w],'_step_', s, '.RData'))
 		  
 		  if (exists('flat.ctrylim')){
 		    ctry.lims = cbind(ctry.lims, sapply(world.csv$CODE, function(x){sum(model$A[x,] * (res.total.restored.pu) * A)}))
@@ -114,7 +117,6 @@ for (s in 1:nsteps){
 		#exrisk.ts <- extinction.risk(habarea.t0 + delta.hab.spp, habarea.max, z=0.25)
 		res.exrisk[,s] <- extinction.risk(habarea.t0 + delta.hab.spp, habarea.max, z=0.25)
 		res.exrisk.sd[,s] <- extinction.risk.sd(habarea.t0 + delta.hab.spp, habarea.max, z=0.25, z.sd=z.sd)
-
 
 		# reclaculate bd benefit
 		bd.s <- calc.bd(exrisk.slope)

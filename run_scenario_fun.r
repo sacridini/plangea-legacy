@@ -48,12 +48,12 @@ s = 1
       w.bd = unlist(weights['w.bd'])[[w]]
       objfun = calc.objective.function(objfuncform, bd, cb, oc, w.cb, w.bd, wrld.form=wrld.form)
       plot.pu.map(objfun * (objfun<fivenum(objfun)[4]),
-                  fname=paste0(outdir, scen, "_map.objfun_", w, "_t0.png"),
+                  fname=paste0(outdir, scen, "_map.objfun_w_", wgt.range[w], "_t0.png"),
                   info=info, weight.print=(n.weights>1))
       
       source("run_optimisation.r")
       
-      w.prt = ifelse(n.weights>1, paste0('_weighting-', w), '')
+      w.prt = ifelse(n.weights>1, paste0('_w-', wgt.range[w]), '')
       
       # plot map of solution
       plot.pu.map(res.grad,
@@ -68,12 +68,12 @@ s = 1
       #            info=info, weight.print=T)
       
       # Saving objects
-      save(res.prop.restored.pu, file=paste0(outdir, scen, "_res.prop.restored.pu_w_", w, ".RData"))
-      save(res.total.restored.pu, file=paste0(outdir, scen, "_res.total.restored.pu_w_", w, ".RData"))
-      save(res.area.restored.spp, file=paste0(outdir, scen, "_res.area.restored.spp_w_", w, ".RData"))
-      save(res.total.restored.spp, file=paste0(outdir, scen, "_res.total.restored.spp_w_", w, ".RData"))
-      save(res.exrisk, file=paste0(outdir, scen, "_res.exrisk_w_", w, ".RData"))
-      save(res.exrisk.sd, file=paste0(outdir, scen, "_res.exrisk.sd_w_", w, ".RData"))
+      save(res.prop.restored.pu, file=paste0(outdir, scen, "_res.prop.restored.pu_w_", wgt.range[w], ".RData"))
+      save(res.total.restored.pu, file=paste0(outdir, scen, "_res.total.restored.pu_w_", wgt.range[w], ".RData"))
+      save(res.area.restored.spp, file=paste0(outdir, scen, "_res.area.restored.spp_w_", wgt.range[w], ".RData"))
+      save(res.total.restored.spp, file=paste0(outdir, scen, "_res.total.restored.spp_w_", wgt.range[w], ".RData"))
+      save(res.exrisk, file=paste0(outdir, scen, "_res.exrisk_w_", wgt.range[w], ".RData"))
+      save(res.exrisk.sd, file=paste0(outdir, scen, "_res.exrisk.sd_w_", wgt.range[w], ".RData"))
       
       # Species list results
       res.spp = base.spp.list
@@ -88,9 +88,10 @@ s = 1
       
       # Removing objects, performing garbage collection
       rm(res.prop.restored.pu, res.total.restored.pu, res.area.restored.spp,
-         res.total.restored.spp, res.exrisk)
+         res.total.restored.spp, res.exrisk, res.exrisk.sd)
       gc()
     } # w
+    
     # Including results of target [sct], under constraint [scc], in the
     # benchmark scenario [scb], in the overall 'results.df' data.frame
     if(!exists("results.df")){results.df = c()}
@@ -139,12 +140,12 @@ s = 1
       res.prop.restored.pu[,1] <- result$x
       res.total.restored.pu <- result$x
       # Saving objects
-      save(res.prop.restored.pu, file=paste0(outdir, scen, "_res.prop.restored.pu_w_", w, ".RData"))
-      save(res.total.restored.pu, file=paste0(outdir, scen, "_res.total.restored.pu_w_", w, ".RData"))
-      save(res.area.restored.spp, file=paste0(outdir, scen, "_res.area.restored.spp_w_", w, ".RData"))
-      save(res.total.restored.spp, file=paste0(outdir, scen, "_res.total.restored.spp_w_", w, ".RData"))
-      save(res.exrisk, file=paste0(outdir, scen, "_res.exrisk_w_", w, ".RData"))
-      save(res.exrisk.sd, file=paste0(outdir, scen, "_res.exrisk.sd_w_", w, ".RData"))
+      save(res.prop.restored.pu, file=paste0(outdir, scen, "_res.prop.restored.pu_w_", wgt.range[w], ".RData"))
+      save(res.total.restored.pu, file=paste0(outdir, scen, "_res.total.restored.pu_w_", wgt.range[w], ".RData"))
+      save(res.area.restored.spp, file=paste0(outdir, scen, "_res.area.restored.spp_w_", wgt.range[w], ".RData"))
+      save(res.total.restored.spp, file=paste0(outdir, scen, "_res.total.restored.spp_w_", wgt.range[w], ".RData"))
+      save(res.exrisk, file=paste0(outdir, scen, "_res.exrisk_w_", wgt.range[w], ".RData"))
+      save(res.exrisk.sd, file=paste0(outdir, scen, "_res.exrisk.sd_w_", wgt.range[w], ".RData"))
       # Removing objects, performing garbage collection
       rm(res.prop.restored.pu, res.total.restored.pu, res.area.restored.spp,
          res.total.restored.spp, res.exrisk)

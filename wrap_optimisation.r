@@ -72,24 +72,30 @@
 
 
 # SCENARIO BLOCK 1: OVERALL-RESTORATION LIMITS ONLY ############################
-info = F
-print.steps = F
-z.sd = 0.1
-DR.sd = 0.05
-PrC.relative.var = 0.25
-PrG.relative.var = 0.25
-quad.sd = T
-CL.prt = T
+info = F # plangea: not needed
+print.steps = F # plangea: not needed
+z.sd = 0.1 # plangea: config.json -> $variables$calc_bd$z_std_dev
+DR.sd = 0.05 # plangea: too specific of how OC was implemented on legacy
+PrC.relative.var = 0.25 # plangea: too specific of how OC was implemented on legacy
+PrG.relative.var = 0.25 # plangea: too specific of how OC was implemented on legacy
+quad.sd = T # plangea: quadratic propagation should be default
+CL.prt = T # plangea: not needed
 ub.perc.constraint = 1
-econ.ub = T
-econ.ctrylim = F
-ublim.suffix = ifelse(econ.ub, '-econ-ub_' , '')
-ublim.cty.range = 1
-target.range = 4
-bench.range = 1:7
-overwrite.nsteps = 5
-#wgt.range = 1
+ub.perc.const = c(0.25, 0.5, 0.75) # plangea: config.json -> $scenarios$upper_bound_limits
+econ.ub = F # plangea: analysis using econometric limits to ub, specific of legacy
+econ.ctrylim = F # plangea: analysis using econometric limits to ctry.lims, specific of legacy
+ublim.suffix = ifelse(econ.ub, '-econ-ub_',  '') 
+ublim.cty.range = 1 # plangea: config.json -> $scenarios$include_subregion_scenarios
+target.range = 4 # plangea: outdated control mechanism of legacy
+bench.range = 1:7 # plangea: outdated control mechanism of legacy
+overwrite.nsteps = 5 # plangea: outdated control mechanism of legacy
+wgt.range = 1 # plangea: outdated control mechanism of legacy
 source("optimisation.r")
+
+ for (ub.perc.constraint in seq_along(ub.perc.const)) {
+   ublim.suffix = paste0('-econ-ub_', ub.perc.constraint)
+   source("optimisation.r")
+}
 
 rm(list=ls(all=T))
 Sys.sleep(1)
@@ -110,12 +116,13 @@ wrld.form = 1
 ub.perc.constraint = 1
 econ.ub = F
 econ.ctrylim = T
-flat.ctrylim.vals = seq(from=0.15, to=0.55, by=0.1)
+#flat.ctrylim.vals = seq(from=0.15, to=0.45, by=0.1)
+flat.ctrylim.vals = 1 #plangea: config.json -> $scenarios$sub-region_scenarios$sub-region_flat_targets_multiplier
 ublim.cty.range = 2
 target.range = 4
 bench.range = 1:7
 overwrite.nsteps = 5
-#wgt.range = 1
+wgt.range = 1
 
 for (flat.ctrylim in flat.ctrylim.vals){
   econ.ctrylim.suffix = ifelse(econ.ctrylim, '-econ-ctrylims_' ,'')
@@ -156,7 +163,8 @@ CL.prt = T
 ub.perc.constraint = 1
 econ.ub = F
 econ.ctrylim = F
-wrld.suffix = c('cb-bd', 'cb-bd-oc', 'bd', 'bd-oc', 'cb', 'cb-oc', 'oc')
+wrld.suffix = c('cb-bd') # , 'cb-bd-oc', 'bd', 'bd-oc', 'cb', 'cb-oc', 'oc')
+wgt.range = 5
 wrld.res.df = c()
 
 for (wrld.loop in wrld.suffix){
@@ -171,12 +179,15 @@ for (wrld.loop in wrld.suffix){
   #load(paste0(outdir, scen, "_step.res_1.RData"))
   #step.ras = step.res
   
-  for (ns in 1:nsteps){
-  #  load(paste0(outdir, scen, "_step.res_", ns, ".RData"))
-  #  step.ras = step.ras + ((nsteps-i) * step.res)
-    wrld.res.df = rbind(wrld.res.df,
-                        postprocess.grad(dir, outdir, ns=ns, filename=paste0(scen, "_res.total.restored.pu_step_", ns, ".RData")))
+  for (wgt in wgt.range){
+    for (ns in 1:nsteps){
+      #  load(paste0(outdir, scen, "_step.res_", ns, ".RData"))
+      #  step.ras = step.ras + ((nsteps-i) * step.res)
+      wrld.res.df = rbind(wrld.res.df,
+                          postprocess.grad(dir, outdir, ns=ns, filename=paste0(scen, '_res.total.restored.pu_w', wgt,'_step_', ns, '.RData')))
+    }    
   }
+
   
   #plot.pu.map(step.ras[master_index], fname=paste0('./opt_results_WRLD_v8/scen_world_incremental-', ublim.suffix,'.png'))
   
@@ -214,5 +225,53 @@ for (ub.perc.constraint in ub.perc.vals){
     source("optimisation.r")
 }
 
+rm(list=ls(all=T))
+Sys.sleep(1)
+gc()
 
 
+
+# SCENARIO BLOCK 5: GLOBAL RESTORATION TARGET MATCHING UB LIMIT ################
+info = F # Should plots be printed with diagnostics info?
+print.steps = F
+z.sd = 0.1
+DR.sd = 0.05
+PrC.relative.var = 0.25
+PrG.relative.var = 0.25
+quad.sd = T
+CL.prt = T
+# ub.perc.vals = seq(from=0.05, to=0.15, by=0.05)
+ub.perc.vals = seq(from=0.15, to=1, by=0.1)
+econ.ub = F
+econ.ctrylim = F
+ublim.cty.range = 1
+target.range = 4
+wgt.range = c(1)
+
+
+match.flag = F # defines if ub limit should be matched to global limit (T) or not (F)
+
+if (match.flag){ # Matching ub limit to global (tgt.mod) limit
+  bench.range = 5
+  overwrite.nsteps = 1
+  for (ub.perc.constraint in ub.perc.vals){
+    tgt.mod.generalized = ub.perc.constraint
+    ublim.suffix = paste0('-ublim-matching-global-at_',round(ub.perc.constraint,2))
+    source("optimisation.r")
+    if(!exists('iter.results')){iter.results = results.df}
+    if(as.character(iter.results[1,1]) != as.character(results.df[1,1])){iter.results = rbind(iter.results, results.df)}
+  }
+  write.csv(iter.results, file="./display_results_CBD_v8/ublim-matching-global_combined-results.csv", row.names=F)  
+} else {# Changing global (tgt.mod) limit keeping ub limit equal to 1
+  for (tgt.mod.generalized in ub.perc.vals){
+    bench.range = 5 #c(2,4,5,7)
+    overwrite.nsteps = 5
+    ublim.suffix = paste0('-global-limit-at_',round(tgt.mod.generalized,2))
+    ub.perc.constraint = 1
+    source("optimisation.r")
+    if(!exists('iter.results')){iter.results = results.df}
+    if(as.character(iter.results[1,1]) != as.character(results.df[1,1])){iter.results = rbind(iter.results, results.df)}
+  }
+  #write.csv(iter.results, file="./display_results_CBD_v8/global_limits-combined-results.csv", row.names=F)
+  #write.csv(iter.results, file="./display_results_CBD_v8/compromise_tradeoff-combined-results.csv", row.names=F)
+}

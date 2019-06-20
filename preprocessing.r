@@ -1234,7 +1234,7 @@ save(country.coefs, file=paste0(dir, "country.coefs.RData"))
 
 
 # Yield Gaps
-gap.agr = extend(raster('./rawdata/5km/others/areascropcomgap2000_ilhas.tif'),
+gap.agr = extend(raster('/home/alvaro/Documents/IIS_PROJECTS/global_rest_prior/global_rest_priorization/rawdata/5km/others/areascropcomgap2000_ilhas.tif'),
                  r.terr, value=0)
 
 # According to table of yield ratio from GAEZ
@@ -1246,9 +1246,13 @@ gap.agr[gap.agr==5] = 1 - ((0.55 + 0.70) / 2)
 gap.agr[gap.agr==6] = 1 - ((0.70 + 0.85) / 2)
 gap.agr[gap.agr==7] = 1 - ((0.85 + 1) / 2)
 
+gap.agr = gap.agr * 0.75
+
 gap.agr = gap.agr[master_index]
 
-gap.grs = raster('./rawdata/5km/others/yield_gap_grasslands.tif')
+gap.grs = raster('/home/alvaro/Documents/IIS_PROJECTS/global_rest_prior/global_rest_priorization/rawdata/5km/others/yield_gap_grasslands.tif')
+
+gap.grs = gap.grs * 0.75
 
 gap.grs = gap.grs[master_index]
 gap.grs[is.na(gap.grs)] = 0

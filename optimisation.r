@@ -247,7 +247,7 @@ ncores <- 4
 ### CAUTION: important to reset oc after running the postprocessing code, so we just reset it
 # here to be safe:
 oc <- (prop.crop / (prop.crop + prop.cultg)) * occ + (prop.cultg / (prop.crop + prop.cultg)) * ocg 
-oc <- oc * g_scalar_oc
+oc <- (oc + 2148) * g_scalar_oc 
 
 
 ### run all the scenarios:

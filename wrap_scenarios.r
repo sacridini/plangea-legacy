@@ -18,9 +18,12 @@
 #library('bit')
 
 # Target scenarios (sct) #######################################################
+tgt.mod = 0.15
+if (exists('tgt.mod.generalized')){tgt.mod = tgt.mod.generalized}
+
 rest.area = list(BONN=1.5e6, NYDC=3.5e6, CTRY=13.3719e6,
-                 CBD = 0.15*sum((prop.crop + prop.cultg)*A),
-                 CBD2 = 0.30*sum((prop.crop + prop.cultg)*A),
+                 CBD = tgt.mod*sum((prop.crop + prop.cultg)*A),
+                 CBD2 = 2*tgt.mod*sum((prop.crop + prop.cultg)*A),
                  WRLD = sum((prop.crop + prop.cultg)*A))
 
 # Load large country.coefs matrix only if needed
@@ -43,7 +46,8 @@ ctry.lims = ctry.lims[-length(ctry.lims[,1]),c(1,length(ctry.lims[1,]))]
 # Correcting country limits units from ha to sq.km
 ctry.lims$total =  ctry.lims$total / 100 
 
-if (econ.ctrylim){ctry.lims$total = econ.ctrylims$SQKM}
+if(!exists('ub.perc.constraint')){ub.perc.constraint=1}
+if (econ.ctrylim){ctry.lims$total = econ.ctrylims$SQKM * ub.perc.constraint}
 
 # Builds country limits depending on flat.ctrylim from wrap_optimisation
 if (exists('flat.ctrylim')){ctry.lims$total = flat.ctrylim * ctry.lims$total}

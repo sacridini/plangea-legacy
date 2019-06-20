@@ -35,13 +35,13 @@ calc.objective.function <- function(form, bd, cb, oc, w.cb=1, w.bd=1, wrld.form=
                 return((-oc + abs(min(-oc)) + 1))
               } else {
                 message("ERROR: undefined objective function form")
-                return(NULL)	
+                return(NULL)  
               }
             }
           }
         }
       }
-    }		
+    }   
   }
 }
 
@@ -67,16 +67,16 @@ calc.sd.objective <- function(form, bd, cb, oc, w.cb=1, w.bd=1, delta.cb=0, delt
               return((delta.cb+ ((w.cb + w.bd) / oc)*delta.oc) / oc)
             } else {
               if (form == "oc"){
-                return((-dalta.oc + abs(min(-delta.oc)) + 1))
+                return((-delta.oc + abs(min(-delta.oc)) + 1))
               } else {
                 message("ERROR: undefined objective function form")
-                return(NULL)	
+                return(NULL)  
               }
             }
           }
         }
       }
-    }		
+    }   
   }
 }
 
@@ -106,7 +106,9 @@ test.objective.function <- function(){
 }
 
 
-# important to implement this as a function because there is good potential for speed-up with this code and we do not want to have to change this many times in optimisation.r
+# important to implement this as a function because there is good potential for 
+# speed-up with this code and we do not want to have to change this many times
+# in optimisation.r
 # also, this is some of the code that is easiest to mess up
 calc.bd <- function(slp){
   bd <- rep(0, np)
@@ -176,7 +178,7 @@ extinction.risk.sd <- function(A, Amax, z=0.25, z.sd=0.05){
 calc.extinction.slope <- function(A, Amax, z=0.25){
   er1 <- extinction.risk(A, Amax, z=z)
   er2 <- extinction.risk(A+1E-6, Amax, z=z)
-  res <- (er2 - er1) / 1E-6	
+  res <- (er2 - er1) / 1E-6 
   return(abs(res))
 }
 
@@ -213,7 +215,7 @@ plot.pu.map <- function(v, fname=NULL, bias=1,
          main=ifelse(info, paste0(save.name, s.info, a.info, length(v), ' px', w.info), ''))
     plot(r, xlim=c(-1.2E7, 1.6E7), ylim=c(-6.5E6, 8828767), col=cols,
          axes=F, box=!info, add=T)
-    dev.off()	  
+    dev.off()   
   } else {
     plot(r, xlim=c(-1.2E7, 1.6E7), ylim=c(-6.5E6, 8828767), col=cols, axes=F, box=!info,
          main=ifelse(info, paste0(save.name, s.info, a.info, length(v), ' px', w.info),''))
@@ -303,8 +305,11 @@ postprocess.results <- function(dir, outdir, scen,
     area.rest <- rep(0, dim(weightm)[1])
     
     for (w in 1:dim(weightm)[1]){
-      load(file=paste0(outdir, scen, "_res.exrisk_w_", w, ".RData"))
-      load(file=paste0(outdir, scen, "_res.exrisk.sd_w_", w, ".RData"))
+      print(paste0(outdir, scen, "_res.exrisk_w_", wgt.range[w], ".RData"))
+      print(paste0(outdir, scen, "_res.exrisk.sd_w_", wgt.range[w], ".RData"))
+      
+      load(file=paste0(outdir, scen, "_res.exrisk_w_", wgt.range[w], ".RData"))
+      load(file=paste0(outdir, scen, "_res.exrisk.sd_w_", wgt.range[w], ".RData"))
       nsteps <- dim(res.exrisk)[2]
       #exrisk.mean[w] <- mean(res.exrisk[,nsteps])
       exrisk.sum[w] <- sum(res.exrisk[,nsteps])
@@ -321,7 +326,8 @@ postprocess.results <- function(dir, outdir, scen,
       exrisk.sum.red.cl[w] = 1.96 * exrisk.sum.red.sd[w]
       #exrisk.red.mean.prop[w] <-  mean((exrisk.t0 - res.exrisk[,nsteps]) / exrisk.t0)
       
-      load(file=paste0(outdir, scen, "_res.total.restored.pu_w_", w, ".RData"))
+      print(paste0(outdir, scen, "_res.total.restored.pu_w_", wgt.range[w], ".RData"))
+      load(file=paste0(outdir, scen, "_res.total.restored.pu_w_", wgt.range[w], ".RData"))
       cb.total[w] <- sum(cb * res.total.restored.pu * A * const_cb)
       cb.total.sd[w] <- ifelse(quad.sd,
                                sqrt(sum( (cb.sd^2) * ((res.total.restored.pu * A * const_cb)^2) )),
